@@ -18,14 +18,9 @@ def handle(client):
     try:
         # waiting for client to send a message
         message = client.recv(1024)
-
-        if message == "!DISCONNECT":
-            # disconnect
-            pass
-        else:
-            print(type(message))
-            pass
-
+        message = message.decode('utf-8')
+        message = parseHTML(message)
+        
     except:
         # Connection Lost Handle
         print(f"Connection Lost with {client}")
