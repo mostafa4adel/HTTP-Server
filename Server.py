@@ -1,6 +1,8 @@
+import re
 import socket
 import threading
 import struct
+from urllib import response
 from HTMLParse import *
 
 
@@ -21,7 +23,23 @@ def handle(client):
         message = message.decode('utf-8')
         message = splitResponse(message)
         if message[0][0] == "GET":
-            pass
+            requestedFileName = message[0][1]
+            if requestedFileName == "/":
+                requestedFileName = "index.html"
+            
+            try:
+                with open(requestedFileName.replace('/','',1)) as f:
+                    lines = f.readlines()
+                response = f"HTTP/1.1 200 OK\r\n\r\n"
+                for l in lines:
+                    response = response + l
+                client.send(bytes(response,'utf-8'))
+                print(response)
+            except:
+                response = f"HTTP/1.1 404 NOT FOUND\r\n"
+                print(response)
+                client.send(bytes(response,'utf-8'))
+            
         elif message[0][0] == "POST":
             pass
         else:

@@ -9,9 +9,9 @@ if __name__ == "__main__":
     commands = []
     with open(commandFile) as f:
       lines = f.readlines()
-      for l in lines:
-        if '\n' in l:
-          l = l[:-1]
+    for l in lines:
+      if '\n' in l:
+        l = l[:-1]
         commands.append(l)
     f.close()
     
