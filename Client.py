@@ -1,6 +1,7 @@
-from cgi import print_environ
-import socket 
 
+import socket
+from venv import create 
+from HTMLParse import *
 
 if __name__ == "__main__":
   while True:
@@ -40,6 +41,23 @@ if __name__ == "__main__":
         #  print(response.decode('utf-8'))
         clientSocket.send(bytes(request,'utf-8'))  
         response = clientSocket.recv(1024)
-        print(response.decode('utf-8'))  
+        response = response.decode('utf-8')
+        parsedResponse = splitResponse(response)
+
+        if parsedResponse[0][1] == "200":
+          
+          FILE_NAME = FILE_NAME.replace('/','_')
+          f= open(FILE_NAME,"w+")
+          f.write(parsedResponse[-1])
+          f.close()
+          print("File Recived and Saved")
+        else:
+          print("ERROR")
         
         clientSocket.close()
+      elif command[0].lower() == 'post':
+        FILE_NAME = command[1]
+        HOST = command[2]
+        HOSTPort = 80 if len(command)<4 else command[3]
+        request = f"POST {FILE_NAME} HTTP/1.1\r\nHost: {HOST}:{HOSTPort}\r\n\r\n"
+        

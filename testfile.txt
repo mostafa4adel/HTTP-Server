@@ -1,2 +1,1 @@
-GET / www.google.com
-GET / www.facebook.com
+POST aloot.txt www.gooogle.com
