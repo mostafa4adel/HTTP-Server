@@ -1,4 +1,3 @@
-
 import string
 
 # Rquest looks like this
@@ -24,9 +23,6 @@ def parseHTML(HTMLrequest:string):
  
  
  return parsedRequest 
-
-
-
 
 if __name__ == "__main__":
  msg = parseHTML(msg)

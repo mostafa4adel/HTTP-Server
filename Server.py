@@ -20,7 +20,12 @@ def handle(client):
         message = client.recv(1024)
         message = message.decode('utf-8')
         message = parseHTML(message)
-        
+        if message[0][0] == "GET":
+            pass
+        elif message[0][0] == "POST":
+            pass
+        else:
+            pass
     except:
         # Connection Lost Handle
         print(f"Connection Lost with {client}")
