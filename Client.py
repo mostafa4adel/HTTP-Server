@@ -13,7 +13,8 @@ if __name__ == "__main__":
         if '\n' in l:
           l = l[:-1]
         commands.append(l)
-    print(commands)
+    f.close()
+    
       
     for command in commands:
       CLIENT = socket.gethostbyname(socket.gethostname())
@@ -59,5 +60,18 @@ if __name__ == "__main__":
         FILE_NAME = command[1]
         HOST = command[2]
         HOSTPort = 80 if len(command)<4 else command[3]
+        
+        with open(FILE_NAME) as postFile:
+          postFileLines = postFile.readlines()
+          
         request = f"POST {FILE_NAME} HTTP/1.1\r\nHost: {HOST}:{HOSTPort}\r\n\r\n"
+        for line in postFileLines:
+          request = request +line
+          
+        clientSocket.connect((HOST,HOSTPort))
+        
+        clientSocket.send(bytes(request,'utf-8'))  
+        response = clientSocket.recv(1024)
+        response = response.decode('utf-8')
+        print(response)
         

@@ -1,1 +1,1 @@
-POST aloot.txt www.gooogle.com
+POST testfileforpost.txt www.google.com
