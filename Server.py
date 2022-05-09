@@ -34,16 +34,24 @@ def handle(client):
                 for l in lines:
                     response = response + l
                 client.send(bytes(response,'utf-8'))
-                print(response)
+                # print(response)
             except:
                 response = f"HTTP/1.1 404 NOT FOUND\r\n"
-                print(response)
+                # print(response)
                 client.send(bytes(response,'utf-8'))
             
         elif message[0][0] == "POST":
-            pass
-        else:
-            pass
+            fileName = message[0][1].replace('/','_')
+            fileName = f"ServerFolder/{fileName}"
+            f= open(fileName,"w+")
+            f.write(message[-1])
+            f.close()
+            response = f"HTTP/1.1 200 OK\r\n\r\n"
+            client.send(bytes(response,'utf-8'))
+            
+        print(f"Connection with {client} Closed!!!")
+        client.close()
+
     except:
         # Connection Lost Handle
         print(f"Connection Lost with {client}")
