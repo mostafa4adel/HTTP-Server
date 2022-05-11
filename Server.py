@@ -108,12 +108,12 @@ if __name__ == "__main__":
     thread2 = threading.Thread(target=http1_1Support,args = ())
     thread1.start()
     thread2.start()
-    
-    
+
+
     while True:
         timeoutInSec = timeoutInSec - (maxNumberOfClients * timeoutInSec)/(len(clients)+1) + 2
-        # 2 is the safety factor
-        
-    
+        # 2 is the min value
+
+
 
 #[(<socket.socket [closed] fd=-1, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0>, 1652281275.6386073, <Thread(Thread-3, stopped 19984)>)]
