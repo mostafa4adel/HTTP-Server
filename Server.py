@@ -3,12 +3,15 @@ import threading
 import time
 
 
+
+maxNumberOfClients = 10
+
 # ==================create server socket========================
 HOST = socket.gethostname()
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # if port cause error change it
 server.bind((HOST, 5050))
-server.listen(10)
+server.listen(maxNumberOfClients)
 # ===============================================================
 
 timeoutInSec = 15
@@ -106,9 +109,10 @@ if __name__ == "__main__":
     thread1.start()
     thread2.start()
     
+    
     while True:
-        pass
-        # handle timeout when clients increase
+        timeoutInSec = timeoutInSec - (maxNumberOfClients * timeoutInSec)/(len(clients)+1) + 2
+        # 2 is the safety factor
         
     
 
