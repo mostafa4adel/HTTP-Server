@@ -19,6 +19,7 @@ if __name__ == "__main__":
     
       
     for command in commands:
+      print("doing command")
       CLIENT = socket.gethostbyname(socket.gethostname())
       clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       
