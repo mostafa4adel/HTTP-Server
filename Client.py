@@ -9,17 +9,18 @@ if __name__ == "__main__":
     commands = []
     with open(commandFile) as f:
       lines = f.readlines()
-      print(lines)
+      
       for l in lines:
         if '\n' in l:
           l = l[:-1]
-          print(l)
         commands.append(l)
     f.close()
     
       
     for command in commands:
+      
       print("doing command")
+      print(command)
       CLIENT = socket.gethostbyname(socket.gethostname())
       clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       
@@ -57,6 +58,7 @@ if __name__ == "__main__":
           f.close()
           print("File Recived and Saved")
         else:
+          print(response)
           print("ERROR")
         
         clientSocket.close()
@@ -78,5 +80,6 @@ if __name__ == "__main__":
         response = clientSocket.recv(1024)
         response = response.decode('utf-8')
         print(response)
+      
       clientSocket.close()
         

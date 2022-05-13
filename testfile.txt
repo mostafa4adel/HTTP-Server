@@ -1,1 +1,1 @@
-GET / 192.168.130.1 5050
+GET / www.facebook.com 80
