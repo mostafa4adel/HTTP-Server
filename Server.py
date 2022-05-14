@@ -15,65 +15,80 @@ server.bind((HOST, 5050))
 server.listen(maxNumberOfClients)
 # ===============================================================
 
-timeoutInSec = 15
+timeoutInSec = 0
+maxtimeoutInSec = 30
 clients = []
 clientsDictionary = {}
+clientsRequests = {}
 
 
 
-
-def handle(client):
-    exitLoop = False
+def reciveMessages(client):
     while True:
-        if exitLoop:
-            break
         try:
             # waiting for client to send a message
             message = client.recv(1024)
             message = message.decode('utf-8')
-            
-            if len(message) == 0:
-                print(f"Client:{client} Lost Connection")
-                client.close()
-                break
-            
-            clientsDictionary[client] = time.time()
-            message = splitResponse(message)
-            if message[0][0] == "GET":
-                requestedFileName = message[0][1]
-                if requestedFileName == "/":
-                    requestedFileName = "index.html"
-                
-                try:
-                    requestedFileName = requestedFileName.replace('/','',1)
-                    with open(requestedFileName.replace('/','_')) as f:
-                        lines = f.readlines()
-                    response = f"HTTP/1.1 200 OK\r\n\r\n"
-                    for l in lines:
-                        response = response + l
-                    client.send(bytes(response,'utf-8'))
-                    # print(response)
-                except:
-                    
-                    response = f"HTTP/1.1 404 NOT FOUND\r\n\r\n"
-                    # print(response)
-                    client.send(bytes(response,'utf-8'))
-                
-            elif message[0][0] == "POST":
-                fileName = message[0][1].replace('/','_')
-                fileName = f"ServerFolder/{fileName}"
-                f= open(fileName,"w+")
-                f.write(message[-1])
-                f.close()
-                response = f"HTTP/1.1 200 OK\r\n\r\n"
-                client.send(bytes(response,'utf-8'))
-            
+            print(f"request recived from {client}")
+            clientsRequests[client].append(message)
             
         except:
-            # Connection Lost Handle
-            print(f"Connection Closed with {client}")
-            
+            print("Error in reciving thread")
             break
+
+
+def handle(client):
+    clientsRequests[client] = []
+    reciveThread = threading.Thread(target = reciveMessages,args=(client,))
+    reciveThread.start()
+    
+    while True:
+        if len(clientsRequests[client]) > 0:
+            try:
+                # waiting for client to send a message
+                print(f"processing request {client}")
+                message = clientsRequests[client].pop(0)
+                if len(message) == 0:
+                    print(f"Client:{client} Lost Connection")
+                    client.close()
+                    break
+                
+                clientsDictionary[client] = time.time()
+                message = splitResponse(message)
+                if message[0][0] == "GET":
+                    requestedFileName = message[0][1]
+                    if requestedFileName == "/":
+                        requestedFileName = "index.html"
+                    
+                    try:
+                        requestedFileName = requestedFileName.replace('/','',1)
+                        with open(requestedFileName.replace('/','_')) as f:
+                            lines = f.readlines()
+                        response = f"HTTP/1.1 200 OK\r\n\r\n"
+                        for l in lines:
+                            response = response + l
+                        client.send(bytes(response,'utf-8'))
+                        # print(response)
+                    except:
+                        
+                        response = f"HTTP/1.1 404 NOT FOUND\r\n\r\n"
+                        # print(response)
+                        client.send(bytes(response,'utf-8'))
+                    
+                elif message[0][0] == "POST":
+                    fileName = message[0][1].replace('/','_')
+                    fileName = f"ServerFolder/{fileName}"
+                    f= open(fileName,"w+")
+                    f.write(message[-1])
+                    f.close()
+                    response = f"HTTP/1.1 200 OK\r\n\r\n"
+                    client.send(bytes(response,'utf-8'))
+                
+                
+            except:
+                # Connection Lost Handle
+                print(f"Connection Closed with {client}")
+                break
             
 
 
@@ -96,10 +111,10 @@ def receiveClients():
 def http1_1Support():
     #just keep looping to monitor the clients
     while True: 
-    
         for client in clients:
             if abs(clientsDictionary[client[0]]- time.time()) > timeoutInSec:
                 client[0].close()
+                print(f"{client[0]} Connection timeout")
                 clients.remove(client)
         
 
@@ -110,9 +125,12 @@ if __name__ == "__main__":
     thread1.start()
     thread2.start()
 
-
+    
     while True:
-        timeoutInSec = timeoutInSec - (maxNumberOfClients * timeoutInSec)/(len(clients)+1) + 2
+        timeoutInSec =  abs(maxNumberOfClients * maxtimeoutInSec)/(10*(len(clients)+1)) + 2
+        time.sleep(4)
+        print(f"timeoutInSec = {timeoutInSec}")
+        
         # 2 is the min value
 
 
