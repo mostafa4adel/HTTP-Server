@@ -1,6 +1,7 @@
 import socket
 import threading
 import time
+from urllib import request
 from HTMLParse import *
 
 
@@ -29,7 +30,10 @@ def reciveMessages(client):
             # waiting for client to send a message
             message = client.recv(1024)
             message = message.decode('utf-8')
+            if len(message) == 0:
+                break
             print(f"request recived from {client}")
+            
             clientsRequests[client].append(message)
             
         except:
@@ -76,8 +80,10 @@ def handle(client):
                         client.send(bytes(response,'utf-8'))
                     
                 elif message[0][0] == "POST":
-                    fileName = message[0][1].replace('/','_')
-                    fileName = f"ServerFolder/{fileName}"
+                    fileName = message[0][1].replace('/','',1)
+                    fileName = message[0][1].replace('/','_',)
+
+                    fileName = f"{fileName}"
                     f= open(fileName,"w+")
                     f.write(message[-1])
                     f.close()
@@ -129,7 +135,7 @@ if __name__ == "__main__":
     while True:
         timeoutInSec =  abs(maxNumberOfClients * maxtimeoutInSec)/(10*(len(clients)+1)) + 2
         time.sleep(4)
-        print(f"timeoutInSec = {timeoutInSec}")
+        
         
         # 2 is the min value
 
